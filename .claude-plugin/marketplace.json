@@ -1,0 +1,11 @@
+{
+  "name": "ai-toolkit",
+  "owner": { "name": "agaaaptr", "url": "https://github.com/agaaaptr" },
+  "plugins": [
+    {
+      "name": "ai-dev-workflow",
+      "source": "./plugins/ai-dev-workflow",
+      "description": "Daily full-stack AI dev workflow: context-load (/sync), orchestrated plan->execute->verify->document loop (/flow) with investigate-confirm-act gates, project bootstrap (/init), session close (/wrap). Depends on Superpowers, context-mode, agentmemory."
+    }
+  ]
+}
