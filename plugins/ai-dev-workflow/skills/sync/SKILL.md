@@ -25,7 +25,7 @@ You are loading project context. This skill is **read-only** — do not edit pro
 
 4. **Detect + report setup.** Determine stack + test/run commands (from manifests/CLAUDE.md). Flag anything non-conventional. This is informational (no mutation here).
 
-5. **Recall memory.** Call `mcp__agentmemory__memory_recall` (or `memory_smart_search`) with the project name/concepts to surface prior decisions and gotchas.
+5. **Recall memory (resilient).** Try `mcp__agentmemory__memory_recall` (or `memory_smart_search`) with the project name/concepts to surface prior decisions and gotchas. **If it returns empty** (agentmemory recall is observed empty in some environments), fall back to `mcp__plugin_context-mode_context-mode__ctx_search` — the persistent context-mode KB auto-captures session decisions and is reliable — and check the native `MEMORY.md`. Surface whatever prior facts you find.
 
 6. **Check for in-progress work.** If `workflow/` exists and contains `<task>.md` files, read their `phase:` frontmatter and surface: "In-progress task(s): <id> at phase <n> — resume with /flow <id>."
 

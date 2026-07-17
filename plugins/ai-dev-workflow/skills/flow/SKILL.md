@@ -27,13 +27,13 @@ Every phase, update `workflow/<task>.md` (template: plugin `templates/workflow-s
   ```
   (custom id: add `?custom_task_ids=true&team_id=$CLICKUP_TEAM_ID`; strip the leading `#`.)
 - If the token is still unset or the fetch fails (e.g. HTTP 400/401), use `AskUserQuestion` to have the user paste the task title + description + acceptance criteria (graceful fallback — no assumption).
-Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptance criteria. Gate: user confirms the task as understood.
+Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptance criteria. **If the ClickUp `description`/acceptance criteria are empty, leave them blank in the state file and flag them for clarification at the phase-3 gate — never assume scope.** Gate: user confirms the task as understood.
 
 **Phase 2 — Investigate.** Dispatch a subagent (`Agent` tool, general-purpose/Explore) to explore the codebase/DB/conventions relevant to the task. Ask it to return FACTS only: affected files, current behavior, conventions, and any **non-conventional** setup. Keep raw exploration out of the main context — keep only the summary. Record facts in the state file's "Detected setup" + a scratch note. Gate: user reviews the facts.
 
 **Phase 3 — Clarify & Confirm (HARD GATE).** List every open question and assumption. Use `AskUserQuestion` (one focused batch) to resolve them. Then print, in a clearly delimited block:
 > **My understanding:** <what the task is, the approach, the files you'll touch, the conventions you'll follow — including any non-conventional handling>
-**Do not proceed until the user explicitly confirms.** Nothing assumed passes this gate. Save the Q&A to the state file's "Open questions & answers" and a memory via `mcp__agentmemory__memory_save`.
+**Do not proceed until the user explicitly confirms.** Nothing assumed passes this gate. Save the Q&A to the state file's "Open questions & answers" (the **durable, reliable** record). Also save a memory via `mcp__agentmemory__memory_save` (**best-effort** — in some envs agentmemory recall returns empty; the `workflow/<task>.md` state file is the source of truth that survives context loss).
 
 **Phase 4 — Plan.** Invoke `superpowers:brainstorming` (if design is unclear) then `superpowers:writing-plans`. Write the spec/plan to `docs/superpowers/`. Record paths in the state file. Gate: user approves the plan.
 

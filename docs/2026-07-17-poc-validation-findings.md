@@ -67,8 +67,9 @@
 - Graceful tidy invocation is present in the loaded `/flow` (F1 fix live). ✓
 - Subagent delegation (phase 2) returns a clean summary, keeping the orchestrator context lean. ✓
 
-## Open improvement backlog (for the ai-toolkit plugin)
-1. **F3 (Critical):** agentmemory save→recall broken in this env — investigate backend OR pivot `/sync`+`/flow` to the harness native `MEMORY.md`. Until resolved, the "survive context loss via agentmemory" claim is unmet.
-2. **F5 (Low):** bake "empty ClickUp description → clarify at phase 3" into `/flow` phase 1 + the state template.
-3. **F6 (Trivial):** fix `workflow-state.md.tpl` markdown spacing.
-4. **Docs:** add the "Bash tool doesn't source ~/.zshrc" gotcha to the README (general env-var note).
+## Improvement backlog — status after fixes (2026-07-17)
+
+1. **F3 (Critical) → MITIGATED:** agentmemory save→recall is still empty in this env (an upstream agentmemory issue, not fixable inside this plugin). Mitigation applied: `/sync` recall now falls back to `ctx_search` (context-mode persistent KB) + native `MEMORY.md` when agentmemory is empty; `/flow` phase 3 marks the agentmemory save best-effort with `workflow/<task>.md` as the durable source of truth. The "survive context loss" claim now rests on the state file + context-mode KB (both reliable), not agentmemory. (Upstream agentmemory backend may still warrant separate investigation.)
+2. **F5 (Low) → FIXED:** `/flow` phase 1 now flags an empty ClickUp description for phase-3 clarification; `workflow-state.md.tpl` "Acceptance criteria" notes the same.
+3. **F6 (Trivial) → FIXED:** `workflow-state.md.tpl` now has blank lines around headings/lists (markdownlint MD022/MD032 resolved).
+4. **Docs → DONE:** README "Known caveats" documents the agentmemory fallback, the `~/.zshrc` non-interactive-shell gotcha, and sparse-task handling.

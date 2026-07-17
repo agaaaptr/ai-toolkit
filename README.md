@@ -60,3 +60,10 @@ If unset, `/flow` falls back to asking you to paste the task.
 ### Update
 
 Edit skills here → `git push`. Users refresh with `/plugin marketplace update ai-toolkit` (marketplace) or `git pull` (clone).
+
+### Known caveats
+
+- **`agentmemory` recall may return empty in some environments** (`memory_save` returns IDs but `recall`/`sessions` come back empty). When that happens, `/sync` falls back to `ctx_search` (the persistent context-mode KB) and the native `MEMORY.md`. The durable, reliable record for any task is always `workflow/<task>.md` — that is what survives context loss, with or without agentmemory.
+- **The Claude Code Bash tool runs a non-interactive shell that does NOT source `~/.zshrc`.** So any env var you export there (e.g. `CLICKUP_API_TOKEN`) is invisible to `/flow`'s shell. `/flow` phase 1 runs `source ~/.zshrc` to load it. (Alternatively, put exports in `~/.zshenv`, which non-interactive zsh does source.)
+- **Sparse ClickUp tasks** (empty `description`/`text_content`) are handled by flagging them for clarification at the `/flow` phase-3 gate — scope is never assumed.
+
