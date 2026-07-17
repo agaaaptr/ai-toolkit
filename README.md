@@ -26,6 +26,8 @@ This plugin delegates to and relies on three other plugins. Install all three vi
 | **context-mode** | `/sync` and `/flow` use `ctx_index`/`ctx_search` for just-in-time retrieval (keeps large files out of the context window). |
 | **agentmemory** | cross-session `recall`/`save` of durable facts. |
 
+**Optional companion — `tidy-session-docs`:** `/wrap` and `/flow` phase 7 use it for doc promotion + scratch cleanup **if present**; otherwise they fall back to an inline minimal tidy. Not required for the workflow to run.
+
 ### Install
 
 **Primary — plugin marketplace:**

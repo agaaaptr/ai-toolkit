@@ -37,7 +37,7 @@ Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptan
 
 **Phase 6 — Verify.** Run the stack-detected test command (from CLAUDE.md/manifest). Capture and show the output as evidence. Gate: evidence shown; user accepts.
 
-**Phase 7 — Document.** Update `API-CONTRACT.md` / `docs/decisions/` (ADR for non-obvious choices) / `docs/handoffs/` as the task requires. Then invoke the `tidy-session-docs` skill to promote durable docs and clear ephemeral scratch. Set the state file `status: done`. Gate: docs reviewed.
+**Phase 7 — Document.** Update `API-CONTRACT.md` / `docs/decisions/` (ADR for non-obvious choices) / `docs/handoffs/` as the task requires. Then **tidy docs (graceful)**: if a `tidy-session-docs` skill is available, invoke it; otherwise inline a minimal tidy — detect the project's scratch vs stable doc convention (from CLAUDE.md "File Organization" or the structure `/init` scaffolded), list durable-doc candidates to promote and ephemeral scratch to delete, and **confirm with the user before moving/deleting anything**. Set the state file `status: done`. Gate: docs reviewed.
 
 ## Hard rules
 - Thin router: delegate, don't reimplement Superpowers.
