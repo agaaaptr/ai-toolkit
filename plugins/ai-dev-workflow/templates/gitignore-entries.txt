@@ -1,0 +1,4 @@
+# Entries /init appends to a project's .gitignore.
+# workflow/ is owned by this workflow (in-flight task state, personal/ephemeral).
+# .notes/ and vibes/ are project-dependent — /init includes them only if the project uses them.
+workflow/
