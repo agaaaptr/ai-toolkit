@@ -17,12 +17,16 @@ Every phase, update `workflow/<task>.md` (template: plugin `templates/workflow-s
 **Phase 0 — Context.** Invoke `/sync` (the Skill tool, skill `sync`) to load+index project context. Gate: context loaded.
 
 **Phase 1 — Intake.** Get the task.
-- If `$CLICKUP_API_TOKEN` is set, fetch via Bash (numeric id):
+- The Bash tool runs a **non-interactive shell that does NOT auto-source `~/.zshrc`**, so load the ClickUp token explicitly before reading it:
+  ```bash
+  source ~/.zshrc >/dev/null 2>&1
+  ```
+- If `$CLICKUP_API_TOKEN` is now set, fetch via Bash:
   ```bash
   curl -s -H "Authorization: $CLICKUP_API_TOKEN" "https://api.clickup.com/api/v2/task/<task_id>"
   ```
   (custom id: add `?custom_task_ids=true&team_id=$CLICKUP_TEAM_ID`; strip the leading `#`.)
-- If the token is unset or the fetch fails, use `AskUserQuestion` to have the user paste the task title + description + acceptance criteria (graceful fallback — no assumption).
+- If the token is still unset or the fetch fails (e.g. HTTP 400/401), use `AskUserQuestion` to have the user paste the task title + description + acceptance criteria (graceful fallback — no assumption).
 Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptance criteria. Gate: user confirms the task as understood.
 
 **Phase 2 — Investigate.** Dispatch a subagent (`Agent` tool, general-purpose/Explore) to explore the codebase/DB/conventions relevant to the task. Ask it to return FACTS only: affected files, current behavior, conventions, and any **non-conventional** setup. Keep raw exploration out of the main context — keep only the summary. Record facts in the state file's "Detected setup" + a scratch note. Gate: user reviews the facts.
