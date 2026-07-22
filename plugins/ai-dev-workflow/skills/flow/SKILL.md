@@ -37,7 +37,7 @@ Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptan
 
 **Phase 4 — Plan.** Invoke `superpowers:brainstorming` (if design is unclear) then `superpowers:writing-plans`. Write the spec/plan to `docs/superpowers/`. Record paths in the state file. Gate: user approves the plan.
 
-**Phase 5 — Execute.** Invoke `superpowers:executing-plans` (TDD, checkpoint review). Update the state file after each plan task. **If any new doubt or non-conventional behavior surfaces, STOP and return to the phase-3 Confirm gate** — do not guess. Gate: per-checkpoint review.
+**Phase 5 — Execute.** Before delegating, state this **binding rule** to the execution: *commit per scope — group changes by conventional-commit type/scope (`feat`/`fix`/`refactor`/`docs`/`test`/`chore`), commit each scope separately; never bundle unrelated changes into one commit; combine only changes that form one logical unit.* Then invoke `superpowers:executing-plans` (TDD, checkpoint review). Update the state file after each plan task. **If any new doubt or non-conventional behavior surfaces, STOP and return to the phase-3 Confirm gate** — do not guess. Gate: per-checkpoint review.
 
 **Phase 6 — Verify.** Run the stack-detected test command (from CLAUDE.md/manifest). Capture and show the output as evidence. Gate: evidence shown; user accepts.
 
@@ -48,3 +48,4 @@ Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptan
 - Never execute (Edit/Write/Run) before the phase-3 Confirm gate passes.
 - Always update `workflow/<task>.md` per phase.
 - On doubt at any phase → back to Confirm.
+- Commit per scope: never bundle unrelated changes into one commit — group by conventional-commit type/scope.
