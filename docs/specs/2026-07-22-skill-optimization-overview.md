@@ -52,6 +52,9 @@ One layout for every project (set up by `/init` SP-4, curated by `/wrap` SP-5). 
 | SP-3 | `/flow` 2-mode (delegate vs inline) + no-ClickUp intake template + checkpoint hook | lean `SKILL.md` + `references/` | ✅ done (pushed) |
 | SP-4 | `/init`: memory-recall doc (2-mode) + **set up standard doc-structure + DOC-POLICY + superpowers override** + **scan existing docs (ask adapt vs leave+generate)** + remove `tidy-session-docs` init | lean `SKILL.md` + `references/` + doc outputs | ✅ done (pushed) |
 | SP-5 | **`/wrap` rewrite**: integrated curation (promote durable → permanent, delete ephemeral incl `.session/` + `.superpowers/sdd/`, enforce naming, update docs to current state, context-aware, report) — supersedes `tidy-session-docs`; + new `/checkpoint` | new skill + `/wrap` rewrite | ✅ done (pushed) |
+| SP-6 | ClickUp **two-way sync** (update status / create subtask / create task) — outward, confirm each | write ops + `references/clickup-write.md` | 🔜 planned — [future-work](2026-07-22-future-work.md) |
+| SP-7 | ClickUp as a **standalone `/clickup` skill**? (management outside the workflow) | tbd | 🔜 planned |
+| SP-8 | **Non-systematic usage resilience** (skip /init, /sync, out-of-order) — graceful per skill | per-skill fallback notes | 🔜 planned |
 
 ## No-ClickUp intake template (for SP-3)
 
