@@ -1,0 +1,5 @@
+# Local SDD / superpowers scratch (session planning state, not source)
+.superpowers/
+
+# OS / editor
+.DS_Store
