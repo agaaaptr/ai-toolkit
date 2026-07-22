@@ -1,7 +1,7 @@
 # Skill Optimization — Overview & Roadmap
 
 - **Date:** 2026-07-22
-- **Status:** In progress (SP-1 spec'd, implementation next)
+- **Status:** ✅ Complete — SP-1…5 implemented + pushed to `main`
 - **Related:** [flow FE versioning design](2026-07-22-flow-fe-versioning-design.md), [version tracking addendum](2026-07-22-version-tracking-and-changelog-env.md)
 
 ## Context
@@ -47,11 +47,11 @@ One layout for every project (set up by `/init` SP-4, curated by `/wrap` SP-5). 
 
 | SP | Focus | Output | Status |
 |---|---|---|---|
-| **SP-1** | Foundation: 2-mode framework + graceful-degradation + progressive-disclosure + commit/push discipline + **doc-structure standard** (DOC-POLICY, superpowers override, curation rules) | shared `references/{modes,skill-structure,commit-push,doc-structure}.md`, README/AGENTS update | spec → [SP-1](2026-07-22-sp1-skill-foundation.md) |
-| SP-2 | `/sync` 2-mode + essential-info brief | lean `SKILL.md` + `references/` | pending |
-| SP-3 | `/flow` 2-mode (delegate vs inline) + no-ClickUp intake template + checkpoint hook | lean `SKILL.md` + `references/` | pending |
-| SP-4 | `/init`: memory-recall doc (2-mode) + **set up standard doc-structure + DOC-POLICY + superpowers override** + **scan existing docs (ask adapt vs leave+generate)** + remove `tidy-session-docs` init | lean `SKILL.md` + `references/` + doc outputs | pending |
-| SP-5 | **`/wrap` rewrite**: integrated curation (promote durable → permanent, delete ephemeral incl `.session/` + `.superpowers/sdd/`, enforce naming, update docs to current state, context-aware, report) — supersedes `tidy-session-docs`; + new `/checkpoint` | new skill + `/wrap` rewrite | pending |
+| **SP-1** | Foundation: 2-mode framework + graceful-degradation + progressive-disclosure + commit/push discipline + **doc-structure standard** (DOC-POLICY, superpowers override, curation rules) | shared `references/{modes,skill-structure,commit-push,doc-structure}.md`, README/AGENTS update | ✅ done (pushed) — [spec](2026-07-22-sp1-skill-foundation.md) |
+| SP-2 | `/sync` 2-mode + essential-info brief | lean `SKILL.md` + `references/` | ✅ done (pushed) |
+| SP-3 | `/flow` 2-mode (delegate vs inline) + no-ClickUp intake template + checkpoint hook | lean `SKILL.md` + `references/` | ✅ done (pushed) |
+| SP-4 | `/init`: memory-recall doc (2-mode) + **set up standard doc-structure + DOC-POLICY + superpowers override** + **scan existing docs (ask adapt vs leave+generate)** + remove `tidy-session-docs` init | lean `SKILL.md` + `references/` + doc outputs | ✅ done (pushed) |
+| SP-5 | **`/wrap` rewrite**: integrated curation (promote durable → permanent, delete ephemeral incl `.session/` + `.superpowers/sdd/`, enforce naming, update docs to current state, context-aware, report) — supersedes `tidy-session-docs`; + new `/checkpoint` | new skill + `/wrap` rewrite | ✅ done (pushed) |
 
 ## No-ClickUp intake template (for SP-3)
 
