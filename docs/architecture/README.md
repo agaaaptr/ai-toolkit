@@ -10,7 +10,7 @@ ai-toolkit/                          marketplace repo
 ├── plugins/
 │   └── ai-dev-workflow/             the plugin
 │       ├── skills/                  one folder per skill, each with SKILL.md
-│       │   ├── init/  sync/  flow/  wrap/
+│       │   ├── init/  sync/  flow/  wrap/  checkpoint/
 │       └── templates/               state-file templates the skills emit
 ├── AGENTS.md                        agent guidance for developing this repo
 └── docs/                            architecture, decisions, specs, plans, findings
@@ -18,14 +18,15 @@ ai-toolkit/                          marketplace repo
 
 A **skill** = a folder with a `SKILL.md` (YAML frontmatter `name` + `description`, then Markdown instructions). Skills may add `scripts/`, `references/`, `assets/`.
 
-## The four skills
+## The five skills
 
 | Skill | Role | Mutates? |
 |---|---|---|
-| `/init` | One-time project bootstrap: detect the real stack, confirm, scaffold only the gaps (`CLAUDE.md`/`AGENTS.md`, `.notes/`, `GUIDE.md`, `workflow/`, `.gitignore`). | Yes (setup) |
-| `/sync` | Session-start context load: index big docs for just-in-time retrieval, read git state, recall memory, print a brief. | No (read-only) |
-| `/flow <task>` | The orchestrated 8-phase loop with human review gates. | Yes |
-| `/wrap` | Session close: run tests, update docs, tidy, report. | Yes (docs) |
+| `/init` | One-time bootstrap: detect stack, confirm, scaffold the standard doc-layout gaps + memory-recall doc. Plugins optional. | Yes (setup) |
+| `/sync` | Session-start context load (2-mode): index/scan, git state, recall memory, essential-info brief. | No (read-only) |
+| `/flow <task>` | The orchestrated 8-phase loop with review gates (2-mode: delegate to Superpowers or inline; ClickUp or no-ID intake). | Yes |
+| `/wrap` | Session close: tests, update docs, curate (built-in tidy), checkpoint, commit, confirm push. | Yes (docs) |
+| `/checkpoint` | Mid-session checkpoint to `workflow/<task>.md` (+ memory if agentmemory) — survives interruption. | Yes (state) |
 
 ## The `/flow` loop
 
@@ -42,15 +43,15 @@ Eight phases, each pausing for user approval:
 
 Every skill follows **Investigate → Confirm → Act**: no edit, run, or execution happens before facts are gathered *and* the user confirms understanding.
 
-## Dependencies
+## Dependencies (all optional)
 
-`ai-dev-workflow` orchestrates three companion plugins:
+`ai-dev-workflow` runs with or without these (rich vs lean — see `references/modes.md`):
 
-- **Superpowers** — `/flow` delegates Plan/Execute/Debug to its skills.
-- **context-mode** — `ctx_index`/`ctx_search` for just-in-time retrieval (keeps large files out of the context window).
-- **agentmemory** — cross-session recall/save of durable facts.
+- **Superpowers** — `/flow` delegates Plan/Execute/Debug to its skills (rich); else inline lean phases.
+- **context-mode** — `ctx_index`/`ctx_search` for just-in-time retrieval (rich); else `Read` + `Grep`.
+- **agentmemory** — cross-session recall/save (rich); else native `MEMORY.md` + `workflow/<task>.md`.
 
-`tidy-session-docs` is an optional companion used by `/wrap` and `/flow` phase 7 if present.
+Doc tidy is built into `/wrap` (no external `tidy-session-docs` needed).
 
 ## State that survives context loss
 

@@ -4,7 +4,7 @@ Guidance for AI coding agents (Claude Code, Cursor, Codex, …) working **on thi
 
 ## What this repo is
 
-A Claude Code plugin marketplace shipping the `ai-dev-workflow` plugin (skills: `init`, `sync`, `flow`, `wrap`). Skills are Markdown instructions to the model, not executable code; they orchestrate other plugins (Superpowers, context-mode, agentmemory). See [docs/architecture/](docs/architecture/).
+A Claude Code plugin marketplace shipping the `ai-dev-workflow` plugin (skills: `init`, `sync`, `flow`, `wrap`, `checkpoint`). Skills are Markdown instructions to the model, not executable code; they orchestrate other plugins (Superpowers, context-mode, agentmemory). See [docs/architecture/](docs/architecture/).
 
 ## Two modes (rich / lean)
 

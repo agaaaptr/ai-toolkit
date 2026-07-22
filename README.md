@@ -20,7 +20,8 @@ This toolkit is built around a single hard rule that addresses both: **Investiga
 | `/init` | One-time project bootstrap — detect the real stack, confirm with you, scaffold only the missing gaps (`CLAUDE.md`/`AGENTS.md`, `GUIDE.md`, `workflow/`, `.gitignore`). |
 | `/sync` | Session-start context load — index big docs for just-in-time retrieval, read git state, recall memory, print a brief. Read-only. |
 | `/flow <task>` | The orchestrated 8-phase loop with human review gates. Fetches a ClickUp task (or accepts a paste). Persists state to `workflow/<task>.md`. |
-| `/wrap` | Session close — run tests, update docs, tidy scratch, report. |
+| `/wrap` | Session close — run tests, update docs, curate (built-in tidy), checkpoint, commit, confirm push. |
+| `/checkpoint` | Mid-session checkpoint — save progress to `workflow/<task>.md` (+ memory if agentmemory). Resume with `/flow <task>`. |
 
 ## How `/flow` works
 
