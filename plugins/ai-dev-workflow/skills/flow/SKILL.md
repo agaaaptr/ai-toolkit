@@ -41,7 +41,17 @@ Create `workflow/<task>.md` from the template; fill `task_id`, `title`, acceptan
 
 **Phase 6 — Verify.** Run the stack-detected test command (from CLAUDE.md/manifest). Capture and show the output as evidence. Gate: evidence shown; user accepts.
 
-**Phase 7 — Document.** Update `API-CONTRACT.md` / `docs/decisions/` (ADR for non-obvious choices) / `docs/handoffs/` as the task requires. Then **tidy docs (graceful)**: if a `tidy-session-docs` skill is available, invoke it; otherwise inline a minimal tidy — detect the project's scratch vs stable doc convention (from CLAUDE.md "File Organization" or the structure `/init` scaffolded), list durable-doc candidates to promote and ephemeral scratch to delete, and **confirm with the user before moving/deleting anything**. Set the state file `status: done`. Gate: docs reviewed.
+**Phase 7 — Document.** Update `API-CONTRACT.md` / `docs/decisions/` (ADR for non-obvious choices) / `docs/handoffs/` as the task requires. Then **tidy docs (graceful)**: if a `tidy-session-docs` skill is available, invoke it; otherwise inline a minimal tidy — detect the project's scratch vs stable doc convention (from CLAUDE.md "File Organization" or the structure `/init` scaffolded), list durable-doc candidates to promote and ephemeral scratch to delete, and **confirm with the user before moving/deleting anything**.
+
+**Angular FE v13 lib release (conditional).** Detect whether this project is an Angular FE v13 `@uiigateway/*` publishable library: (1) root `package.json` has `@angular/core` `~13.x`/`^13.x`, AND (2) a `projects/<scope>/<lib>/package.json` with a `version` field exists, AND (3) its `name` matches `@uiigateway/*`. If all three hold, use `AskUserQuestion` to offer a version action (`patch`/`minor`/`major`/`next-pre-release`/`skip`; show the current plain version): `patch`/`minor`/`major` → new plain version (suffix resets to 0); `next-pre-release` → same plain version, suffix +1 (`b0→b1`, `rc0→rc1`). On `skip` → do nothing. Otherwise:
+1. **(patch/minor/major)** Edit the lib `package.json` to the new **plain** version; prepend a `## <today> (<new plain version>)` entry to `CHANGELOG.md` (plain, match the latest entry's style, summarize the session's changes); commit both: `chore: bump version to <new version>`. **(next-pre-release)** leave `package.json` unchanged; optionally append a bullet to the existing version's CHANGELOG entry (confirm with user).
+2. Branch: `git rev-parse --abbrev-ref HEAD`. Suffix kind: `develop`→`b`, `staging`→`rc`, `master`→none (plain), other→`AskUserQuestion`.
+3. **Counter N (deterministic):** list `git tag -l "<target>-<kind>*"` for the target version + suffix kind; parse the integer after `<kind>` from each match; `N = max + 1`, or `0` if none. Compare numerically (`b10` > `b9`). A new plain version has no matching tags → N resets to 0, so `2.1.0-b0 → 2.1.0-b1 → 2.1.1-b0` works with no special case.
+4. Tag: `develop`→`<target>-b<N>`; `staging`→`<target>-rc<N>`; `master`→`<target>`.
+5. `git push origin <branch>` (if new commits); then `git tag -a "<tag>" -m "release: <target>"` and `git push origin "<tag>"`.
+If the project is not an Angular v13 `@uiigateway/*` lib, skip this step entirely.
+
+Set the state file `status: done`. Gate: docs reviewed.
 
 ## Hard rules
 - Thin router: delegate, don't reimplement Superpowers.
