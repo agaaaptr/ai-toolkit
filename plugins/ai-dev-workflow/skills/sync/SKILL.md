@@ -1,44 +1,27 @@
 ---
 name: sync
-description: Load and index project context at the start of a session (explicit trigger, read-only, idempotent). Reads CLAUDE.md/AGENTS.md, indexes .notes/GUIDE.md and docs/ into context-mode for just-in-time retrieval (no large dumps into the context window), reads git state, detects and reports the project's real setup for confirmation, recalls relevant facts from agentmemory, and prints a session brief (with an offer to resume any in-progress task). Run with /sync whenever you begin a session or need a project refresher.
+description: Load + index project context at session start (explicit, read-only, idempotent). Detects mode, reads anchors + git state, indexes big docs (rich) or notes key files (lean), recalls memory, prints an essential-info brief (project type, stack, key config, commands — no large dumps). Run /sync at session start or for a refresher.
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, mcp__plugin_context-mode_context-mode__ctx_index, mcp__plugin_context-mode_context-mode__ctx_search, mcp__agentmemory__memory_recall, mcp__agentmemory__memory_smart_search
 ---
 
-You are loading project context. This skill is **read-only** — do not edit project files. **Spine: Investigate → Confirm → Act** applies to *reporting* setup, not mutating.
+Load project context. **Read-only** — do not edit project files. Spine: Investigate → Confirm (report setup) → Act (none).
 
 ## Procedure
+0. **Detect mode.** Read the plugin `references/modes.md` (auto + override `ai-dev-workflow.mode`). Record rich/lean per capability (context-mode, agentmemory).
+1. **Read anchors.** Read `CLAUDE.md` + `AGENTS.md` (always-on; re-read to ground the brief).
+2. **Index/scan knowledge (JIT — keep it OUT of context).** Rich (context-mode): `ctx_index` `.notes/GUIDE.md` + `docs/`. Lean (no context-mode): note the key doc paths only — do not dump; `ctx_search` if a prior session captured the KB, else flag "scan on demand". Detail: `references/procedure.md`.
+3. **Git state.** `git rev-parse --abbrev-ref HEAD` ; `git status --porcelain` ; `git log --oneline -3`.
+4. **Detect + report setup.** Stack + test/run cmd (manifests / `CLAUDE.md`); project type (BE / FE). Flag non-conventional. Informational — no mutation.
+5. **Recall memory (resilient).** Rich (agentmemory): `memory_recall` / `smart_search`; **if empty**, fall back to `ctx_search` + native `MEMORY.md`. Lean: `MEMORY.md` only. Surface 2–4 top facts.
+6. **In-progress work.** If `workflow/` has `<task>.md`, surface its phase + a resume hint.
+7. **Published versions (Angular v13 `@uiigateway/*` lib only).** Run `npm run versions` if present, else `npm view <pkg> versions --json` → latest-per-env. Skip silently otherwise.
+8. **Print the brief** (essential info only — fields in `references/procedure.md`). Then await the user — do not auto-start.
 
-1. **Read the anchors.** Read `CLAUDE.md` and `AGENTS.md` (these are always-on but re-read to ground the brief).
+## Fallbacks & confirms
+- Missing plugin → use the lean branch AND tell the user (e.g. "context-mode absent — scanning key files instead"). See plugin `references/modes.md`.
+- No memory found → say so; the durable record is always `workflow/<task>.md`.
 
-2. **Index big knowledge for JIT retrieval** (keep it OUT of the context window). Call `mcp__plugin_context-mode_context-mode__ctx_index` on:
-   - `.notes/GUIDE.md` (if present) — `source: "GUIDE.md"`.
-   - `docs/` directory (if present) — `source: "docs"`.
-   Do NOT print their contents. Subsequent lookups use `mcp__plugin_context-mode_context-mode__ctx_search`.
-
-3. **Read git state.** Run via Bash:
-   ```bash
-   git rev-parse --abbrev-ref HEAD
-   git status --porcelain
-   git log --oneline -3
-   ```
-
-4. **Detect + report setup.** Determine stack + test/run commands (from manifests/CLAUDE.md). Flag anything non-conventional. This is informational (no mutation here).
-
-5. **Recall memory (resilient).** Try `mcp__agentmemory__memory_recall` (or `memory_smart_search`) with the project name/concepts to surface prior decisions and gotchas. **If it returns empty** (agentmemory recall is observed empty in some environments), fall back to `mcp__plugin_context-mode_context-mode__ctx_search` — the persistent context-mode KB auto-captures session decisions and is reliable — and check the native `MEMORY.md`. Surface whatever prior facts you find.
-
-6. **Check for in-progress work.** If `workflow/` exists and contains `<task>.md` files, read their `phase:` frontmatter and surface: "In-progress task(s): <id> at phase <n> — resume with /flow <id>."
-
-7. **Dependency check.** If context-mode or agentmemory tools are unavailable, warn (they are required for full `/sync`).
-
-8. **Published versions (Angular v13 `@uiigateway/*` lib only).** If the detected project is an Angular v13 `@uiigateway/*` publishable library, get the latest published version per branch for the brief: prefer running `npm run versions` if it exists (it prints the summary and refreshes `VERSIONS.md`); otherwise run `npm view <pkg> versions --json` and classify by suffix (`-bN`→develop, `-rcN`→staging, plain→master). Skip silently if not such a project.
-
-9. **Print the session brief** (concise):
-   - Detected setup (stack, test/run cmd, conventional/non-conventional).
-   - Current branch + uncommitted file count + last 3 commits.
-   - Top recalled facts (2-4 bullets).
-   - Published versions per branch (if Angular v13 `@uiigateway/*` lib).
-   - In-progress task offer (if any).
-   - Recommended next step (e.g. "/flow <task>" or "describe what you want to do").
-
-End by awaiting the user's direction. Do not auto-start work.
+## References
+- plugin `references/modes.md` — mode detection + degradation
+- `references/procedure.md` — detailed steps, indexing/recall fallbacks, brief fields
