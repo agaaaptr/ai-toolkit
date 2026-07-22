@@ -31,10 +31,13 @@ You are loading project context. This skill is **read-only** — do not edit pro
 
 7. **Dependency check.** If context-mode or agentmemory tools are unavailable, warn (they are required for full `/sync`).
 
-8. **Print the session brief** (concise):
+8. **Published versions (Angular v13 `@uiigateway/*` lib only).** If the detected project is an Angular v13 `@uiigateway/*` publishable library, get the latest published version per branch for the brief: prefer running `npm run versions` if it exists (it prints the summary and refreshes `VERSIONS.md`); otherwise run `npm view <pkg> versions --json` and classify by suffix (`-bN`→develop, `-rcN`→staging, plain→master). Skip silently if not such a project.
+
+9. **Print the session brief** (concise):
    - Detected setup (stack, test/run cmd, conventional/non-conventional).
    - Current branch + uncommitted file count + last 3 commits.
    - Top recalled facts (2-4 bullets).
+   - Published versions per branch (if Angular v13 `@uiigateway/*` lib).
    - In-progress task offer (if any).
    - Recommended next step (e.g. "/flow <task>" or "describe what you want to do").
 
