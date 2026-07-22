@@ -2,7 +2,7 @@
 
 > A Claude Code plugin marketplace shipping **`ai-dev-workflow`** — a daily, stack-agnostic AI development loop that survives context loss and never acts on assumptions.
 
-`ai-dev-workflow` orchestrates the full lifecycle of a single task — intake, investigation, confirmation, planning, execution, verification, documentation — delegating the heavy lifting to specialized plugins and persisting state so work survives context loss across sessions.
+`ai-dev-workflow` orchestrates the full lifecycle of a single task — intake, investigation, confirmation, planning, execution, verification, documentation — delegating to specialized plugins when present (else inlining lean phases) and persisting state so work survives context loss. It runs **with or without plugins** (2-mode).
 
 ## Why
 
@@ -17,9 +17,9 @@ This toolkit is built around a single hard rule that addresses both: **Investiga
 
 | Command | What it does |
 |---|---|
-| `/init` | One-time project bootstrap — detect the real stack, confirm with you, scaffold only the missing gaps (`CLAUDE.md`/`AGENTS.md`, `GUIDE.md`, `workflow/`, `.gitignore`). |
-| `/sync` | Session-start context load — index big docs for just-in-time retrieval, read git state, recall memory, print a brief. Read-only. |
-| `/flow <task>` | The orchestrated 8-phase loop with human review gates. Fetches a ClickUp task (or accepts a paste). Persists state to `workflow/<task>.md`. |
+| `/init` | One-time project bootstrap — detect the real stack, confirm with you, scaffold the standard doc-layout gaps (`docs/{specs,plans,decisions,…}` + `DOC-POLICY.md`, `.session/`, `CLAUDE.md`/`AGENTS.md`), scan existing docs (adapt vs leave), and (if agentmemory) generate a memory-recall doc. |
+| `/sync` | Session-start context load (2-mode: index via context-mode, or scan key files) — read git state, recall memory, print an essential-info brief (project type / stack / config). Read-only. |
+| `/flow [clickup-id]` | The orchestrated 8-phase loop with review gates. With a ClickUp id → fetch; without → systematic intake template. 2-mode (delegate to Superpowers, or inline lean). Persists state to `workflow/<task>.md`. |
 | `/wrap` | Session close — run tests, update docs, curate (built-in tidy), checkpoint, commit, confirm push. |
 | `/checkpoint` | Mid-session checkpoint — save progress to `workflow/<task>.md` (+ memory if agentmemory). Resume with `/flow <task>`. |
 
@@ -32,7 +32,7 @@ Eight phases, each pausing for your approval:
          → 4 Plan → 5 Execute → 6 Verify → 7 Document (+ conditional release)
 ```
 
-`/flow` is a **thin router**: it delegates Plan/Execute to the Superpowers skills (TDD, executing-plans) rather than reimplementing them. Phase 3 is a hard anti-assumption gate — every open question is resolved with you before any code is touched. Phase 7 commits per scope and, for Angular FE v13 `@uiigateway/*` libraries, offers a version bump + env-suffixed tag.
+`/flow` is a **thin router** in rich mode (delegates Plan/Execute to the Superpowers skills) or **inlines lean phases** when Superpowers is absent. Phase 3 is a hard anti-assumption gate — every open question is resolved with you before any code is touched. Phase 7 commits per scope, **confirms push with you**, and (for Angular FE v13 `@uiigateway/*` libraries) offers a version bump + env-suffixed tag; for auto-deploy backends it skips the tag.
 
 ## Repository structure
 
@@ -40,7 +40,8 @@ Eight phases, each pausing for your approval:
 ai-toolkit/
 ├── .claude-plugin/marketplace.json   marketplace manifest
 ├── plugins/ai-dev-workflow/
-│   ├── skills/{init,sync,flow,wrap}/ one SKILL.md per skill
+│   ├── skills/{init,sync,flow,wrap,checkpoint}/  one SKILL.md per skill (+ per-skill references/)
+│   ├── references/                   cross-cutting: modes, skill-structure, commit-push, doc-structure
 │   └── templates/                    state-file templates
 ├── AGENTS.md                         agent guidance for developing this repo
 └── docs/                             architecture, decisions, specs, plans, findings
@@ -88,22 +89,23 @@ ln -s ~/.agents/skills/ai-toolkit ~/.claude/skills/ai-toolkit
 git clone https://github.com/agaaaptr/ai-toolkit ~/.claude/skills/ai-toolkit
 ```
 
-## Configuration (ClickUp, for `/flow`)
+## Configuration (ClickUp — optional, for `/flow`)
 
-`/flow` fetches the task via the ClickUp REST API. Export in `~/.zshrc` (never commit):
+`/flow` works **with or without** a ClickUp id (no id → systematic intake template). To fetch a ClickUp task, export in `~/.zshrc` (never commit):
 ```bash
 export CLICKUP_API_TOKEN="pk_..."     # ClickUp → Settings → Apps → Generate
 export CLICKUP_TEAM_ID="..."          # only for custom ids like #ABC-123
 ```
-If unset, `/flow` falls back to asking you to paste the task.
+If unset (or no id given), `/flow` uses the intake template — ClickUp is not required.
 
 ## Usage
 
 ```
 /init                      # once per project
 /sync                      # at the start of each session
-/flow <clickup-id>         # run the loop for one task
-/wrap                      # close the session
+/flow [clickup-id]         # run the loop (id → fetch; no id → intake template)
+/checkpoint                # mid-session checkpoint (survives interruption)
+/wrap                      # close the session (tests, curate, commit, confirm push)
 ```
 
 ## Development
