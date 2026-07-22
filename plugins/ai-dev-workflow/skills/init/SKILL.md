@@ -1,36 +1,27 @@
 ---
 name: init
-description: One-time project bootstrap for the AI dev workflow. Detects (never assumes) the project's real stack and existing structure, confirms with the user, then scaffolds ONLY the gaps (CLAUDE.md/AGENTS.md/.notes/GUIDE.md/docs/vibes/workflow/.gitignore) and checks that the dependency plugins (Superpowers, context-mode, agentmemory) are installed. Run once per project with /init.
+description: One-time project bootstrap. Detects (never assumes) the real stack + existing structure, confirms with the user, scaffolds ONLY the gaps to the standard doc-layout (docs/{specs,plans,decisions,...}+DOC-POLICY.md, .session/, workflow/, CLAUDE.md/AGENTS.md), asks whether to adapt existing docs, and (if agentmemory) generates a memory-recall doc. Plugins are optional. Run once per project with /init.
 user-invocable: true
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__plugin_context-mode_context-mode__ctx_index, mcp__agentmemory__memory_save
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__plugin_context-mode_context-mode__ctx_index, mcp__agentmemory__memory_recall, mcp__agentmemory__memory_save
 ---
 
-You are bootstrapping a project for the AI dev workflow. **Spine (hard rule): Investigate → Confirm → Act.** Do not create or overwrite anything until you have detected the real setup AND the user has confirmed.
+Bootstrap a project. **Spine: Investigate → Confirm → Act.** Do not create or overwrite anything until the real setup is detected AND the user confirms.
 
 ## Procedure
+0. **Detect mode.** Read plugin `references/modes.md` (auto + override `ai-dev-workflow.mode`). Plugins are **optional** — record what is present; never block on a missing one.
+1. **Detect (do not assume).** Scan root: docs (`CLAUDE.md`, `AGENTS.md`, `README.md`, `docs/`, `.notes/GUIDE.md`, `.claude/`), stack manifests (`go.mod` / `package.json` / `composer.json` / `angular.json` / `pom.xml` / …), build/test/run commands, `.gitignore`. Note anything non-conventional. Detail: `references/bootstrap.md`.
+2. **Confirm.** Present detected setup + "existing I will NOT touch" + "gaps I will fill" via `AskUserQuestion`. Never overwrite a mature existing file without explicit confirmation.
+3. **Existing docs?** If an existing doc structure or similar docs are found → ASK: (a) adapt to the standard, or (b) leave as-is and generate the standard alongside. (Standard docs are always generated.) See plugin `references/doc-structure.md`.
+4. **Scaffold gaps** (from `templates/` + standard layout): `CLAUDE.md` / `AGENTS.md` (if missing), `.notes/GUIDE.md`, the standard `docs/{specs,plans,decisions,architecture,reference,handoffs,findings}/` + `docs/DOC-POLICY.md`, `.session/` (gitignored), `workflow/`. Add the superpowers override (specs → `docs/specs/`, plans → `docs/plans/`) to `AGENTS.md`/`CLAUDE.md`. Append gitignore entries. Detail: `references/bootstrap.md`.
+5. **Memory-recall doc.** If agentmemory: `memory_recall` project memories → generate `docs/reference/project-memory.md` (memories + their recall queries). Lean (no agentmemory): ensure native `MEMORY.md` exists. Detail: `references/bootstrap.md`.
+6. **Save memory** (if agentmemory, best-effort): the detected setup + stack (so `/sync`/`/flow` recall it next session).
+7. **Report.** What was created / skipped, plugins present vs absent (optional), and suggest `/sync`.
 
-1. **Detect (do not assume).** Scan the project root for:
-   - Docs: `CLAUDE.md`, `AGENTS.md`, `README.md`, `docs/`, `vibes/`, `.notes/GUIDE.md`, `.claude/skills/`.
-   - Stack manifests: `go.mod`, `package.json`, `composer.json`, `angular.json`, `requirements.txt`, `pom.xml`, `build.gradle`, `Cargo.toml`.
-   - Build/test/run commands: read the detected manifest + any `Makefile`, `package.json` scripts, `run*.sh`, `artisan`.
-   - Existing `.gitignore`.
-   Use `Glob`/`Grep`/`Read`. Note anything **non-conventional** (custom build scripts, monorepo layout, unusual test runner).
+## Fallbacks & confirms
+- Plugins optional — never block on a missing plugin; note it.
+- No agentmemory → skip the memory-recall doc; ensure `MEMORY.md`.
+- Never overwrite/delete existing docs without explicit confirmation (the scan-step question).
 
-2. **Confirm.** Present to the user, via `AskUserQuestion` or a clear summary:
-   - "Detected setup: <stack, test cmd, run cmd, conventional/non-conventional notes>."
-   - "Existing structure I will NOT touch: <list>."
-   - "Gaps I will fill: <list of files/folders to create>."
-   Ask the user to confirm or correct. **Never overwrite a mature existing file without explicit confirmation.**
-
-3. **Scaffold only the gaps** (copy from the plugin's `templates/`):
-   - `CLAUDE.md`, `AGENTS.md` — only if missing.
-   - `.notes/GUIDE.md` — only if missing (from `GUIDE.md.tpl`).
-   - `docs/{reference,handoffs,decisions}/`, `vibes/`, `docs/superpowers/{specs,plans}/` — only missing dirs.
-   - `workflow/` — create (owned by this workflow).
-   - Append `workflow/` (and `.notes/`, `vibes/` if the project uses them) to `.gitignore` using the `gitignore-entries.txt` template — do not duplicate existing entries.
-
-4. **Dependency check.** Verify the three plugins are installed. A simple probe: check whether the `superpowers:*`, `context-mode:*`, and `agentmemory` skills/tools are available (e.g. attempt a harmless `mcp__plugin_context-mode_context-mode__ctx_stats` or check the skills list). For any missing dependency, warn and print the install instruction from the README.
-
-5. **Save a memory** via `mcp__agentmemory__memory_save`: the detected setup + stack of this project (so `/sync`/`/flow` recall it next session).
-
-6. **Report.** Summarize what was created, what was skipped (already present), and any missing dependencies. End by suggesting the user run `/sync`.
+## References
+- plugin `references/modes.md`, `references/doc-structure.md`
+- `references/bootstrap.md` — detect checklist, scaffold detail, DOC-POLICY template, memory-recall doc format
