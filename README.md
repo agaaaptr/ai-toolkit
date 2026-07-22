@@ -47,17 +47,25 @@ ai-toolkit/
 
 See [`docs/architecture/`](docs/architecture/) for the full system overview.
 
-## Prerequisites
+## Prerequisites (optional)
 
-`ai-dev-workflow` orchestrates three companion plugins — install them first:
+The three companion plugins are **optional** — `ai-dev-workflow` runs with or without them (see Two modes below):
 
-| Plugin | Role |
-|---|---|
-| **Superpowers** | `/flow` delegates plan/execute/debug to its skills. |
-| **context-mode** | JIT retrieval (`ctx_index`/`ctx_search`) — keeps large files out of context. |
-| **agentmemory** | Cross-session recall/save of durable facts. |
+| Plugin | Role | If absent |
+|---|---|---|
+| **Superpowers** | `/flow` delegates plan/execute/debug to its skills. | inline lean phases |
+| **context-mode** | JIT retrieval (`ctx_index`/`ctx_search`) — keeps large files out of context. | `Read` + `Grep` |
+| **agentmemory** | Cross-session recall/save of durable facts. | native `MEMORY.md` |
 
-`tidy-session-docs` is an optional companion (used by `/wrap` and `/flow` phase 7 if present).
+## Two modes (rich / lean)
+
+- **Rich** — plugins installed: maximal capability (more tokens).
+- **Lean** — no plugins: token-efficient fallbacks, still systematic.
+- Default **auto** (each skill probes what is available, per capability). Override in the project's `CLAUDE.md`/`AGENTS.md`:
+  ```
+  ai-dev-workflow.mode: auto | rich | lean
+  ```
+- Internals: [`references/modes.md`](plugins/ai-dev-workflow/references/modes.md) · skill authoring [`references/skill-structure.md`](plugins/ai-dev-workflow/references/skill-structure.md) · commit/push [`references/commit-push.md`](plugins/ai-dev-workflow/references/commit-push.md) · doc layout [`references/doc-structure.md`](plugins/ai-dev-workflow/references/doc-structure.md).
 
 ## Installation
 
