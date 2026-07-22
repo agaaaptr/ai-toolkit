@@ -5,7 +5,7 @@
     {
       "name": "ai-dev-workflow",
       "source": "./plugins/ai-dev-workflow",
-      "description": "Daily full-stack AI dev workflow: context-load (/sync), orchestrated plan->execute->verify->document loop (/flow) with investigate-confirm-act gates, project bootstrap (/init), session close (/wrap). Depends on Superpowers, context-mode, agentmemory."
+      "description": "Daily, stack-agnostic AI dev workflow — 2-mode (runs with OR without plugins). Skills: /init bootstrap, /sync context-load, /flow 8-phase plan->execute->verify->document loop (investigate-confirm-act gates; ClickUp or no-id intake), /wrap session close (built-in doc curation), /checkpoint mid-session resume. Plugins (Superpowers, context-mode, agentmemory) optional."
     }
   ]
 }
