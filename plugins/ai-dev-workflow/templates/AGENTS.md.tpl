@@ -12,3 +12,7 @@
 
 ## Conventions
 - [the 3-5 rules an agent must follow]
+
+## AI workflow docs
+
+This project uses `ai-dev-workflow`. Specs → `docs/specs/`, plans → `docs/plans/` (override Superpowers' default `docs/superpowers/`). Doc layout + curation rules: the plugin's `references/doc-structure.md`. Plugins optional (2-mode).

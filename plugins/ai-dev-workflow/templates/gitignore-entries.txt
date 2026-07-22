@@ -1,4 +1,8 @@
-# Entries /init appends to a project's .gitignore.
-# workflow/ is owned by this workflow (in-flight task state, personal/ephemeral).
-# .notes/ and vibes/ are project-dependent — /init includes them only if the project uses them.
+# Entries /init appends to a project's .gitignore (ai-dev-workflow standard layout).
+# workflow/            — in-flight task state (owned by the workflow; ephemeral/personal)
+# .session/            — session scratch (promote-or-delete each session)
+# .superpowers/sdd/    — Superpowers SDD scratch (cleaned each session)
+# .notes/ is project-dependent — /init includes it only if the project uses it.
 workflow/
+.session/
+.superpowers/
