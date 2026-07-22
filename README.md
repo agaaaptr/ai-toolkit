@@ -1,69 +1,113 @@
 # ai-toolkit
 
-A personal collection of Claude Code plugins/skills/hooks for AI-assisted development.
+> A Claude Code plugin marketplace shipping **`ai-dev-workflow`** — a daily, stack-agnostic AI development loop that survives context loss and never acts on assumptions.
 
-## Plugins
+`ai-dev-workflow` orchestrates the full lifecycle of a single task — intake, investigation, confirmation, planning, execution, verification, documentation — delegating the heavy lifting to specialized plugins and persisting state so work survives context loss across sessions.
 
-### ai-dev-workflow — Full AI Development Workflow
+## Why
 
-A daily, stack-agnostic dev loop that eliminates repeated context-explanation and survives context loss.
+Two failure modes waste the most time when pair-programming with an agent:
 
-**Skills:**
-- `/init` — one-time project bootstrap (detect + confirm + scaffold gaps).
-- `/sync` — load + index project context at session start (explicit, read-only).
-- `/flow <task>` — orchestrated 8-phase loop with anti-assumption gates; fetches a ClickUp task.
-- `/wrap` — close the session (tests + docs + tidy).
+1. **Context loss** — long sessions get summarized; the agent forgets what it was doing.
+2. **Assumptions** — the agent acts on a guess instead of confirming, and you discover it three steps later.
 
-**Spine (hard rule):** Investigate → Confirm → Act. Nothing executes before facts are gathered and you confirm understanding.
+This toolkit is built around a single hard rule that addresses both: **Investigate → Confirm → Act**. Nothing executes before facts are gathered *and* you confirm understanding, and every phase is persisted to a state file so the loop can resume anywhere.
 
-### Dependencies (install these first)
+## Skills
 
-This plugin delegates to and relies on three other plugins. Install all three via your Claude Code plugin manager before using the workflow:
+| Command | What it does |
+|---|---|
+| `/init` | One-time project bootstrap — detect the real stack, confirm with you, scaffold only the missing gaps (`CLAUDE.md`/`AGENTS.md`, `GUIDE.md`, `workflow/`, `.gitignore`). |
+| `/sync` | Session-start context load — index big docs for just-in-time retrieval, read git state, recall memory, print a brief. Read-only. |
+| `/flow <task>` | The orchestrated 8-phase loop with human review gates. Fetches a ClickUp task (or accepts a paste). Persists state to `workflow/<task>.md`. |
+| `/wrap` | Session close — run tests, update docs, tidy scratch, report. |
+
+## How `/flow` works
+
+Eight phases, each pausing for your approval:
+
+```
+0 Context → 1 Intake → 2 Investigate → 3 Clarify & Confirm (HARD gate)
+         → 4 Plan → 5 Execute → 6 Verify → 7 Document (+ conditional release)
+```
+
+`/flow` is a **thin router**: it delegates Plan/Execute to the Superpowers skills (TDD, executing-plans) rather than reimplementing them. Phase 3 is a hard anti-assumption gate — every open question is resolved with you before any code is touched. Phase 7 commits per scope and, for Angular FE v13 `@uiigateway/*` libraries, offers a version bump + env-suffixed tag.
+
+## Repository structure
+
+```
+ai-toolkit/
+├── .claude-plugin/marketplace.json   marketplace manifest
+├── plugins/ai-dev-workflow/
+│   ├── skills/{init,sync,flow,wrap}/ one SKILL.md per skill
+│   └── templates/                    state-file templates
+├── AGENTS.md                         agent guidance for developing this repo
+└── docs/                             architecture, decisions, specs, plans, findings
+```
+
+See [`docs/architecture/`](docs/architecture/) for the full system overview.
+
+## Prerequisites
+
+`ai-dev-workflow` orchestrates three companion plugins — install them first:
 
 | Plugin | Role |
 |---|---|
-| **Superpowers** | `/flow` delegates plan/execute/debug phases to its skills (brainstorming, writing-plans, executing-plans, systematic-debugging, test-driven-development). |
-| **context-mode** | `/sync` and `/flow` use `ctx_index`/`ctx_search` for just-in-time retrieval (keeps large files out of the context window). |
-| **agentmemory** | cross-session `recall`/`save` of durable facts. |
+| **Superpowers** | `/flow` delegates plan/execute/debug to its skills. |
+| **context-mode** | JIT retrieval (`ctx_index`/`ctx_search`) — keeps large files out of context. |
+| **agentmemory** | Cross-session recall/save of durable facts. |
 
-**Optional companion — `tidy-session-docs`:** `/wrap` and `/flow` phase 7 use it for doc promotion + scratch cleanup **if present**; otherwise they fall back to an inline minimal tidy. Not required for the workflow to run.
+`tidy-session-docs` is an optional companion (used by `/wrap` and `/flow` phase 7 if present).
 
-### Install
+## Installation
 
-**Primary — plugin marketplace:**
+**Plugin marketplace (primary):**
 ```
 /plugin marketplace add agaaaptr/ai-toolkit
 /plugin install ai-dev-workflow@ai-toolkit
 ```
 
-**Secondary — npx skills (community, discoverability):**
+**npx skills (community discoverability):**
 ```bash
 npx skills add agaaaptr/ai-toolkit
-# verify install path; if it landed in ~/.agents/skills/, symlink:
+# if it lands in ~/.agents/skills/, symlink:
 ln -s ~/.agents/skills/ai-toolkit ~/.claude/skills/ai-toolkit
 ```
 
-**Fallback — git clone:**
+**Git clone (fallback):**
 ```bash
 git clone https://github.com/agaaaptr/ai-toolkit ~/.claude/skills/ai-toolkit
 ```
 
-### ClickUp (for `/flow` intake)
+## Configuration (ClickUp, for `/flow`)
 
-`/flow` fetches a task via the ClickUp REST API. Set in `~/.zshrc` (never commit):
+`/flow` fetches the task via the ClickUp REST API. Export in `~/.zshrc` (never commit):
 ```bash
-export CLICKUP_API_TOKEN="pk_..."        # ClickUp -> Settings -> Apps -> Generate
-export CLICKUP_TEAM_ID="..."             # only for custom ids like #ABC-123
+export CLICKUP_API_TOKEN="pk_..."     # ClickUp → Settings → Apps → Generate
+export CLICKUP_TEAM_ID="..."          # only for custom ids like #ABC-123
 ```
 If unset, `/flow` falls back to asking you to paste the task.
 
-### Update
+## Usage
 
-Edit skills here → `git push`. Users refresh with `/plugin marketplace update ai-toolkit` (marketplace) or `git pull` (clone).
+```
+/init                      # once per project
+/sync                      # at the start of each session
+/flow <clickup-id>         # run the loop for one task
+/wrap                      # close the session
+```
 
-### Known caveats
+## Development
 
-- **`agentmemory` recall may return empty in some environments** (`memory_save` returns IDs but `recall`/`sessions` come back empty). When that happens, `/sync` falls back to `ctx_search` (the persistent context-mode KB) and the native `MEMORY.md`. The durable, reliable record for any task is always `workflow/<task>.md` — that is what survives context loss, with or without agentmemory.
-- **The Claude Code Bash tool runs a non-interactive shell that does NOT source `~/.zshrc`.** So any env var you export there (e.g. `CLICKUP_API_TOKEN`) is invisible to `/flow`'s shell. `/flow` phase 1 runs `source ~/.zshrc` to load it. (Alternatively, put exports in `~/.zshenv`, which non-interactive zsh does source.)
-- **Sparse ClickUp tasks** (empty `description`/`text_content`) are handled by flagging them for clarification at the `/flow` phase-3 gate — scope is never assumed.
+This repo is itself developed with Claude Code. [`AGENTS.md`](AGENTS.md) holds the conventions for editing skills safely (SKILL.md format, commit-per-scope, where specs/plans go, how to validate). Edit skills here, then users refresh via `/plugin marketplace update ai-toolkit` (or `git pull`).
 
+## Known caveats
+
+- **`agentmemory` recall may return empty** in some environments. When it does, `/sync` falls back to `ctx_search` (the context-mode KB) and the native `MEMORY.md`. The durable record for any task is always `workflow/<task>.md`.
+- **Non-interactive shell:** the Claude Code Bash tool does not source `~/.zshrc`, so `/flow` phase 1 runs `source ~/.zshrc` to load `CLICKUP_API_TOKEN` (or put exports in `~/.zshenv`, which non-interactive zsh does source).
+- **Sparse ClickUp tasks** (empty description) are flagged for clarification at the phase-3 gate — scope is never assumed.
+
+## Documentation
+
+- [Architecture](docs/architecture/) · [Decision records (ADRs)](docs/decisions/)
+- [Design specs](docs/specs/) · [Implementation plans](docs/plans/) · [Validation findings](docs/findings/)
