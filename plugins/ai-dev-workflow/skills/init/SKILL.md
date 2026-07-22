@@ -2,7 +2,7 @@
 name: init
 description: One-time project bootstrap. Detects (never assumes) the real stack + existing structure, confirms with the user, scaffolds ONLY the gaps to the standard doc-layout (docs/{specs,plans,decisions,...}+DOC-POLICY.md, .session/, workflow/, CLAUDE.md/AGENTS.md), asks whether to adapt existing docs, and (if agentmemory) generates a memory-recall doc. Plugins are optional. Run once per project with /init.
 user-invocable: true
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__plugin_context-mode_context-mode__ctx_index, mcp__agentmemory__memory_recall, mcp__agentmemory__memory_save
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__agentmemory__memory_recall, mcp__agentmemory__memory_save
 ---
 
 Bootstrap a project. **Spine: Investigate → Confirm → Act.** Do not create or overwrite anything until the real setup is detected AND the user confirms.

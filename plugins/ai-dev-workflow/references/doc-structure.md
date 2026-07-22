@@ -11,6 +11,7 @@ One documentation layout for every project — set up by `/init`, curated by `/w
 - `docs/handoffs/` — cross-team (BE↔FE) handoffs
 - `docs/findings/` — validation / incident records
 - `docs/DOC-POLICY.md` — declares this classification + naming + red-flags
+- root `README.md` / `CHANGELOG.md` / `CLAUDE.md` / `AGENTS.md` — project-root anchors (keep)
 
 ## Ephemeral (gitignored, promote-or-delete each session — only durable survives)
 - `.session/` — neutral session scratch.

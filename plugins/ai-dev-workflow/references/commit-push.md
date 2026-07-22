@@ -1,6 +1,6 @@
 # Commit / Push Discipline + CI-aware Post-push
 
-Every push-capable skill (`/flow`, `/wrap`, `/checkpoint`) follows this.
+Every push-capable skill (`/flow`, `/wrap`) follows this.
 
 ## Commit
 - **Per scope** (conventional commits: `feat` / `fix` / `docs` / `chore` / `refactor`). Never bundle unrelated changes into one commit.
@@ -23,6 +23,4 @@ After a confirmed push, read the project's CI config to decide the relevant next
 4. **Never assume** — if the CI config is unclear, ask.
 
 ## Version-bump + tag flow
-For tag-publish projects → the `/flow` Phase 7 procedure (tag-first; plain `package.json` version; counter `N = max+1`/`0`, numeric; env suffix `-bN`/`-rcN`/plain per branch). See `/flow` `SKILL.md`.
-
-> Note: the currently-shipped `/flow` pushes + tags inline without the explicit push-confirm / CI-driven question. SP-3 aligns it with this reference.
+For tag-publish projects → the `/flow` Phase 7 procedure (tag-first; plain `package.json` version; counter `N = max+1`/`0`, numeric; env suffix `-bN`/`-rcN`/plain per branch). See `/flow` `references/release.md`.

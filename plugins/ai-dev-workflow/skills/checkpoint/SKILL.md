@@ -20,4 +20,4 @@ Save a checkpoint. **Spine: Investigate → Confirm → Act.**
 - No agentmemory → state file only (still durable).
 
 ## References
-- `/flow` `references/phases.md` — checkpoint format details
+None — self-contained. (The `/flow` state file `workflow/<task>.md` is the shared resume record.)
