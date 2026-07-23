@@ -2,6 +2,8 @@
 
 Everything that isn't the runnable skills: the system's architecture, the decisions behind it, the validated designs, the execution plans, and the validation findings.
 
+> **📍 Current direction (2026-07):** This repository is being redesigned into **Noir** — a standalone, host-agnostic AI development toolkit. Blueprint: [`specs/2026-07-23-noir-toolkit-design.md`](specs/2026-07-23-noir-toolkit-design.md). Living forward plan: [`roadmap.md`](roadmap.md). The legacy `ai-toolkit` marketplace / `ai-dev-workflow` plugin identity is deprecated pending implementation.
+
 ## Structure
 
 | Path | Purpose |
